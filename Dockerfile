@@ -1,4 +1,4 @@
-FROM       docker:27
+FROM       opensuse/leap:latest
 LABEL      maintainer="BlueT - Matthew Lien - 練喆明 <bluet@bluet.org>"
 
 # Docker defaults
@@ -8,7 +8,9 @@ ENV        CRONICLE_WebServer__http_port=3012
 ENV        CRONICLE_WebServer__https_port=443
 ENV        EDITOR=nano
 
-RUN        apk add --no-cache nodejs npm git curl perl bash perl-pathtools tar procps nano tini python3
+RUN        zypper --non-interactive refresh && \
+           zypper --non-interactive install nodejs npm git curl perl bash tar procps nano tini python3
+
 RUN        mkdir -p /opt/cronicle \
                 && cd /opt/cronicle \
                 && curl -L https://github.com/jhuckaby/Cronicle/archive/v${CRONICLE_VERSION}.tar.gz | tar zxvf - --strip-components 1 \
@@ -17,8 +19,8 @@ RUN        mkdir -p /opt/cronicle \
                 && rm -Rf /root/.npm
 
 # Runtime user
-# RUN        adduser cronicle -D -h /opt/cronicle
-# RUN        adduser cronicle docker
+# RUN        useradd -m -d /opt/cronicle cronicle
+# RUN        usermod -aG docker cronicle
 WORKDIR    /opt/cronicle/
 ADD        docker/entrypoint.sh /entrypoint.sh
 
